@@ -14,7 +14,7 @@ exports.createContacts = async (contactsGroup) => {
 
   console.log("Creating contacts for " + groupName)
 
-  for (const contact of [contactsGroup.contacts[0]]) {
+  for (const contact of contactsGroup.contacts) {
       if (!contact.$email) {
         console.log("No email for the contact. skipping", JSON.stringify(contact, null, 2))
         continue
