@@ -1,32 +1,52 @@
-import { mixPanelApiUrl, mixPanelApiSecret, mixPanelProjectId } from "../constants"
+const { mixPanelApiUrl, mixPanelApiSecret, mixPanelProjectId } = require("../constants")
+const fetch = require("node-fetch")
+const { handleFetch } = require("../helpers/fetchHelper")
 
-
-async function getContactsForCohort(id) {
-  await fetch({
-    url: `${mixPanelApiUrl}/engage?project_id=${mixPanelProjectId}`,
+function getContactsForCohort(id) {
+  return handleFetch(fetch(`${mixPanelApiUrl}/engage?project_id=${mixPanelProjectId}`, {
+    method: "POST",
     headers: {
       "Authorization": `Basic ${mixPanelApiSecret}`,
       "ContentType": "application/json"
     },
     body: JSON.stringify({
       filter_by_cohort: { id },
-      output_properties: ["$email", "$city", "$name"]
+      output_properties: ["$email", "$name"]
     })
-  }).then(r => r.json())
+  }))
 }
 
-export async function getContacts()  {
-  const result = await fetch({
-    url: `${mixPanelApiUrl}/cohorts/list?project_id=${mixPanelProjectId}`,
-    headers: {
-      "Authorization": `Basic ${mixPanelApiSecret}`
-    }
-  }).then(r => r.json())
+exports.getContacts = async function getContacts()  {
+  try {
+    console.log("Getting cohorts")
+    const result = await handleFetch(fetch(`${mixPanelApiUrl}/cohorts/list?project_id=${mixPanelProjectId}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Basic ${mixPanelApiSecret}`
+      }
+    }))
 
-  return Promise.all(result
-    .map(async cohort =>  ({
-        contacts: await getContactsForCohort(cohort.id),
-        cohortName: cohort.name,
-        cohortId: cohort.id
-    })))
+    console.log(`Found ${result.length} cohorts`)
+
+    const groups = []
+    for (const cohort of result) {
+      console.log(`Getting contacts for ${cohort.name}`)
+      try {
+        const contacts = await getContactsForCohort(cohort.id)
+        if (contacts.results && contacts.results.length) {
+          console.log(`Found ${contacts.results.length} contacts`)
+          groups.push({ contacts: contacts.results.map(r => r.$properties), name: cohort.name })
+        }
+      } catch (e) {
+        console.log(`cannot get contacts for cohort ${cohort.name} (${e.statusText})`)
+      }
+    } 
+
+    return groups
+
+  } catch (e) {
+    console.log(`cannot get cohorts.(${e.statusText})`)
+  }
 }
+
+
