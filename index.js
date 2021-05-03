@@ -1,18 +1,27 @@
-const { getContacts } =  require("./services/mixPanelService")
-const  { createContacts } = require("./services/hubSpotService");
+const { getContacts } = require("./services/mixPanelService")
+const { createContacts } = require("./services/hubSpotService");
+const _ = require("lodash");
 
 (async () => {
   const groups = await getContacts()
-  for (const group of groups) {
+
+  const allContacts = _.uniq(_.flatMap(groups
+    .map(g => g.contacts))
+    .filter(a => a.$email), a => a.$email)
+
+  allContacts.map(c => {
+    c.cohorts = groups.filter(g =>  g.contacts.some(cc => c.$email === cc.$email))
+        .map(c => c.name)
+  })
+  
+  
+  
+  console.log(allContacts.map(c => c.cohorts));
+
+  const groups = 
+  
+  
+  /*for (const group of groups) {
     await createContacts(group)
-  }
+  }*/
 })()
-  // .then(list => {
-  //     list.map(item => {
-  //       item.contacts.then(contacts => {
-  //         if (contacts.length) {
-  //           createContacts({ contacts: [contacts[0]], name: item.cohortName})
-  //         }
-  //       })
-  //     })
-  // })

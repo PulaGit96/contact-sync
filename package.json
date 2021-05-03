@@ -10,6 +10,7 @@
   "author": "Pulasthi",
   "license": "ISC",
   "dependencies": {
+    "lodash": "^4.17.21",
     "node-fetch": "^2.6.1"
   }
 }

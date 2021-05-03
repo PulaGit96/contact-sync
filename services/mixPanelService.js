@@ -16,7 +16,7 @@ function getContactsForCohort(id) {
   }))
 }
 
-exports.getContacts = async function getContacts()  {
+exports.getContacts = async function getContacts() {
   try {
     console.log("Getting cohorts")
     const result = await handleFetch(fetch(`${mixPanelApiUrl}/cohorts/list?project_id=${mixPanelProjectId}`, {
@@ -27,7 +27,6 @@ exports.getContacts = async function getContacts()  {
     }))
 
     console.log(`Found ${result.length} cohorts`)
-
     const groups = []
     for (const cohort of result) {
       console.log(`Getting contacts for ${cohort.name}`)
@@ -40,7 +39,7 @@ exports.getContacts = async function getContacts()  {
       } catch (e) {
         console.log(`cannot get contacts for cohort ${cohort.name} (${e.statusText})`)
       }
-    } 
+    }
 
     return groups
 
