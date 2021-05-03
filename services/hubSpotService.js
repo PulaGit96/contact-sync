@@ -30,7 +30,7 @@ exports.createContacts = async (contactsGroup) => {
       email: contact.$email,
       firstname: split[0],
       lastname: split[1],
-      mixpanelcohort: groupName
+      mixpanelcohort: contact.cohorts.join(",") 
     }
 
     const headers = {

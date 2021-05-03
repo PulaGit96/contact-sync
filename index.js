@@ -14,14 +14,25 @@ const _ = require("lodash");
         .map(c => c.name)
   })
   
-  
-  
-  console.log(allContacts.map(c => c.cohorts));
+  const finalGroups = {}
 
-  const groups = 
+  allContacts.forEach(c => {
+    c.cohorts.forEach(ch => {
+      if (finalGroups[ch]) {
+        finalGroups[ch].contacts.push(c)
+      } else {
+        finalGroups[ch] = {
+          name: ch,
+          contacts: [c]
+        }
+      }
+    })
+  })
+
+  console.log(JSON.stringify(finalGroups, null, 2))
   
   
-  /*for (const group of groups) {
+  for (const group of groups) {
     await createContacts(group)
-  }*/
+  }
 })()
